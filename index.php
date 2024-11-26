@@ -1,10 +1,36 @@
 <?php
+require_once('clases/personas.php');
+$disabled = '';
+$personas = new Personas();
+$personasId = '';
+$nombres = '';
+$apellidos = '';
+$identificacion = '';
+$nacionalidad = '';
+$direccion = '';
+$telefono = '';
+$email = '';
+
 if(isset($_GET['accion'])) {
     $accion = $_GET['accion'];
+    $personasId = $_GET['personasId'];
+    $disabled = 'disabled';
+    if($accion == 'editar') {
+        $serviciosId = unserialize($_GET['serviciosId']);
+    }
+    $personas->buscarPorId($personasId);
+    $nombres = $personas->getNombres();
+    $apellidos = $personas->getApellidos();
+    $identificacion = $personas->getIdentificacion();
+    $nacionalidad = $personas->getNacionalidad();
+    $direccion = $personas->getDireccion();
+    $telefono = $personas->getTelefono();
+    $email = $personas->getEmail();
 } else {
     $accion = 'guardar';
 }
 ?>
+
 <!DOCTYPE html> 
 <html lang="en"> 
 <head> 
@@ -16,24 +42,24 @@ if(isset($_GET['accion'])) {
     <h1><center>REGISTRO</center></h1>
 <form action="procesar.php"  method="POST" id="form" onsubmit="return validarInfo()">
      
-    <label>nombres:</label>
-    <input type="text" id="nombres" name="nombres"> <br>
+    <label for="nombres">nombres:</label>
+    <input type="text" id="nombres" name="nombres" value="<?php echo $nombres;?>"> <br>
 
         <br>
 
-    <label>apellidos:</label>
-    <input type="text" id="apellidos" name="apellidos"> <br> 
+    <label for="apellidos">apellidos:</label>
+    <input type="text" id="apellidos" name="apellidos" value="<?php echo $apellidos;?>"> <br> 
 
         <br>
 
-    <label>identificacion:</label>
-    <input type="text" id='identificacion' name='identificacion'> <br>
+    <label for="identificacion">identificacion:</label>
+    <input type="text" id='identificacion' name='identificacion' value="<?php echo $identificacion;?>"> <br>
 
         <br>
 
-    <label>nacionalidad:</label>
+    <label for="nacionalidad">nacionalidad:</label>
 
-    <select name="nacionalidad">
+    <select name="nacionalidad" value="<?php echo $nacionalidad;?>">
     <option value="vnzl">venezolano</option>
     <option value="extr">extranjero</option>
     </select>
@@ -41,16 +67,16 @@ if(isset($_GET['accion'])) {
 
         <br>
 
-    <label>direccion:</label>
-    <input type="text" id="direccion" name="direccion"> <br>
+    <label for="direccion">direccion:</label>
+    <input type="text" id="direccion" name="direccion" value="<?php echo $direccion;?>"> <br>
         <br>
 
-        <label>telefono</label>
-    <input type="text" id="telefono" name="telefono"> <br>   
+        <label for="telefono">telefono</label>
+    <input type="text" id="telefono" name="telefono" value="<?php echo $telefono;?>"> <br>   
          <br>
 
-    <label>email:</label>
-    <input type="email" id="email" name="email"> <br>
+    <label for="email">email:</label>
+    <input type="email" id="email" name="email" value="<?php echo $email;?>"> <br>
 
          <br>
 
@@ -64,6 +90,15 @@ if(isset($_GET['accion'])) {
                 $listadoServicios = $servicios->buscarTodo();
                 if ($listadoServicios->num_rows > 0) {
                     while($arrServicio = $listadoServicios->fetch_array()) {
+                        $checked = '';
+                        if ($disabled === 'disabled') {
+                            foreach ($serviciosId as $key => $id) {
+                                if ($arrServicio['id'] === $id) {
+                                    $checked = 'checked';
+                                    break;
+                                }
+                            }
+                        }
                       echo ' 
                         <label>
                         <input
@@ -71,6 +106,8 @@ if(isset($_GET['accion'])) {
                             id="chck"
                             name="chck[]"
                             value="'.$arrServicio['id'].'"
+                            '.$checked.'
+                            '.$disabled.'
                         >
                             '.$arrServicio['servicio'].'
                         </label><br>
@@ -78,22 +115,22 @@ if(isset($_GET['accion'])) {
                     }
                 }
         ?>
-
          <br>
 
         <br>
-
+    <input type="hidden" value="<?php echo $personasId; ?>" name="personasId"> 
     <button type="submit" name="accion" value="<?php echo $accion?>">Enviar</button>
 
     <br>
 
 </form> 
-<script src="script.js"></script> 
-
+ 
 <h4>contratos</h4>
 <hr>
 <?php
     include('contratos.php');
 ?>
+
+<script src="script.js"></script>
 </body> 
 </html>
