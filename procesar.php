@@ -1,7 +1,14 @@
 <?php
 
-require_once("clases/personas.php");
+require_once('clases/personas.php');
 $personas = new Personas();
+
+        if(isset($_POST['personasId'])) {
+            $personas->setId($_POST['personasId']);
+        }
+        if(isset($_GET['personasId'])) { 
+            $personas->setId($_GET['personasId']);
+        }
         if(isset($_POST['nombres'])) {
          $personas->setNombres($_POST['nombres']);
         }
@@ -32,12 +39,22 @@ $personas = new Personas();
         if(isset($_GET['accion'])) {
                 $accion = $_GET['accion'];
             } else {
-            $accion = '';
+                $accion = '';
         }
     }
+
         if($accion == 'guardar') {
             $personas->save();
-            echo "registro guardado";
+            echo '<h3>registro guardado</h3><br><a href="index.php"><h3>volver</h3></a>';
         }
-            echo '<a href="index.php">volver</a>'
+        if($accion == 'editar') {
+            $personas->update();
+            echo '<h3>registro editado</h3><br><a href="index.php"><h3>volver</h3></a>';
+        }
+        if($accion == 'eliminar') {
+            $personas->delete();
+            echo '<h3>registro eliminado</h3><br><a href="index.php"><h3>volver</h3></a>';
+        }
+    
+
 ?> 
