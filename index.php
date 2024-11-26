@@ -84,37 +84,27 @@ if(isset($_GET['accion'])) {
 
          <br>
 
-        <?php 
-            require_once('clases/servicios.php');
-            $servicios = new Servicios();
-                $listadoServicios = $servicios->buscarTodo();
-                if ($listadoServicios->num_rows > 0) {
-                    while($arrServicio = $listadoServicios->fetch_array()) {
-                        $checked = '';
-                        if ($disabled === 'disabled') {
-                            foreach ($serviciosId as $key => $id) {
-                                if ($arrServicio['id'] === $id) {
-                                    $checked = 'checked';
-                                    break;
-                                }
-                            }
-                        }
-                      echo ' 
-                        <label>
-                        <input
-                            type="checkbox"
-                            id="chck"
-                            name="chck[]"
-                            value="'.$arrServicio['id'].'"
-                            '.$checked.'
-                            '.$disabled.'
-                        >
-                            '.$arrServicio['servicio'].'
-                        </label><br>
-                        ';
-                    }
-                }
-        ?>
+        <?php
+require_once('clases/servicios.php');
+$servicios = new Servicios();
+$listadoServicios = $servicios->buscarTodo();
+
+if ($listadoServicios->num_rows > 0) {
+    echo '<fieldset>';
+    echo '<legend>Select Services</legend>';
+    while ($arrServicio = $listadoServicios->fetch_array()) {
+        $checked = $disabled === 'disabled' && in_array($arrServicio['id'], $serviciosId) ? 'checked' : '';
+        $disabled_attr = $disabled === 'disabled' ? 'disabled' : '';
+        echo '<label>';
+        echo '<input type="checkbox" id="chck_' . $arrServicio['id'] . '" name="chck[]" value="' . $arrServicio['id'] . '" ' . $checked . ' ' . $disabled_attr . '>';
+        echo $arrServicio['servicio'];
+        echo '</label><br>';
+    }
+    echo '</fieldset>';
+}
+?>
+
+                      
          <br>
 
         <br>
