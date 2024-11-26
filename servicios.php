@@ -13,6 +13,9 @@
             function getServicio() {
                 return $this->servicio;
             }
+            function getId() {
+                return $this->id;
+            }
                 function buscarTodo() {
                     $sql = 'select * from servicios';
                     $declaracion = $this->con->prepare($sql);
