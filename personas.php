@@ -11,10 +11,10 @@ class Personas {
     protected $telefono;
     protected $email;
     protected $arrServiciosId;
-    protected $arrservicio;
+    protected $arrServicio;
     private $conexion;
 
-    function __construct() {
+    function __construct() { 
         $this->conexion = new mysqli('localhost', 'root', '', 'registros');
         }
         function setId($id) {
@@ -73,20 +73,21 @@ class Personas {
         function getEmail(){
             return $this->email;
         }
-        function getServicio() {
-            return $this->arrservicio;
+        function getServicios() {
+            return $this->arrServicio;
         }
         function getServiciosId() {
             return $this->arrServiciosId;
         }
         function mostrarServicios() {
-            $lista = '';
+            $lista= '';
             $lista .= '<ul>';
-            foreach($this->getServicio() as $servicio) {
+            foreach ($this->getServicios() as $key => $servicio) {
                 $lista .= '<li>'.$servicio->getServicio() .'</li>';
             }
             $lista .= '</ul>';
-            return $lista;
+            return $lista
+            ;  
         }
 
     function save(){
@@ -104,11 +105,54 @@ class Personas {
         $personasId = $declaracion->insert_id;
         foreach ($this->getServiciosId() as $serviciosId) {
            $sql = "insert into personas_servicios(personasId, serviciosId)values(?,?)";
-           $sql = $this->conexion->prepare($sql);
-           $declaracion->bind_param('ss', $personasId, $serviciosId);
+           $declaracion = $this->conexion->prepare($sql);
+           $declaracion->bind_param('ii', $personasId, $serviciosId);
            $declaracion->execute();
         }
     }
+
+    function update(){
+        $sql = 'update personas set nombres=?, apellidos=?, identificacion=?, nacionalidad=?, direccion=?, telefono=?, email=? where id = ?';
+        $declaracion = $this->conexion->prepare($sql);
+        $id = $this->getId();
+        $nombres = $this->getNombres();
+        $apellidos = $this->getApellidos();
+        $identificacion = $this->getIdentificacion();
+        $nacionalidad = $this->getNacionalidad();
+        $direccion = $this->getDireccion();
+        $telefono = $this->getTelefono();
+        $email = $this->getEmail();
+        $declaracion->bind_param('ssissisi', $nombres, $apellidos, $identificacion, $nacionalidad, $direccion, $telefono, $email, $id);
+        $declaracion->execute();
+    }
+
+    function delete() {
+        $id = $this->getId();
+        $sql = 'delete from personas_servicios where personasId=?';
+        $declaracion = $this->conexion->prepare($sql);
+        $declaracion->bind_param('i', $id);
+        $declaracion->execute();
+        $sql = 'delete from personas where id=?';
+        $declaracion = $this->conexion->prepare($sql);
+        $declaracion->bind_param('i', $id);
+        $declaracion->execute();
+    }
+
+    function buscarPorId($id) {
+        $sql = 'select * from personas where id = '.$id.'';
+        $declaracion = $this->conexion->prepare($sql);
+        $declaracion->execute();
+        $result = $declaracion->get_result();
+        $data = $result->fetch_array();
+        $this->setNombres($data['nombres']);
+        $this->setApellidos($data['apellidos']);
+        $this->setIdentificacion($data['identificacion']);
+        $this->setNacionalidad($data['nacionalidad']);
+        $this->setDireccion($data['direccion']);
+        $this->setTelefono($data['telefono']);
+        $this->setEmail($data['email']);
+    }
+
 function buscarTodo() {
     $sql = "select * from personas";
     $declaracion = $this->conexion->prepare($sql);
@@ -126,8 +170,8 @@ function buscarTodo() {
         $personaTemp->setDireccion($data['direccion']);
         $personaTemp->setTelefono($data['telefono']);
         $personaTemp->setEmail($data['email']);
-        $sql = 'select * from personas_servicios inner join servicio on personas_servicios.serviciosId = servicios.id where personasId = ?';
-        $declaracion = $this->conn->prepare($sql);
+        $sql = 'select * from personas_servicios inner join servicios on personas_servicios.serviciosId = servicios.id where personasId = ?';
+        $declaracion = $this->conexion->prepare($sql);
         $declaracion->bind_param('i', $data['id']);
         $declaracion->execute();
         $resultServicios = $declaracion->get_result();
